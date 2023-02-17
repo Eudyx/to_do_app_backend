@@ -4,9 +4,11 @@ const app = express();
 const path = require('path');
 const cors = require('cors');
 const corsOptions = require('./config/corsOptions');
+const cookieParser = require('cookie-parser');
 
 
 const connectDB = require('./config/dbConn');
+const { default: mongoose } = require('mongoose');
 const PORT = process.env.PORT || 3500;
 
 // Connect to MongoDB
@@ -18,9 +20,13 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use(express.json());
 
+app.use(cookieParser());
+
 app.use('/', require('./routes/root'));
 
 app.use('/register', require('./routes/register'));
+
+app.use('/login', require('./routes/auth'));
 
 app.all('*', (req, res) => {
     res.status(400);
@@ -33,4 +39,7 @@ app.all('*', (req, res) => {
     }
 });
 
-app.listen(PORT, () => console.log(`Server running in port ${PORT}`));
+mongoose.connection.once('open', () => {
+    console.log('Connected to MongoDB');
+    app.listen(PORT, () => console.log(`Server running in port ${PORT}`));
+});
