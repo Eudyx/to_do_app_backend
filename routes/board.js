@@ -10,6 +10,7 @@ router.route('/').post(boardController.createNewBoard)
 router.route('/sections').put(boardController.addingNewSection)
                         .delete(boardController.deleteSection);
 
-router.put('/tasks', boardController.addingNewTask);
+router.route('/tasks').put(boardController.addingNewTask)
+                        .delete(boardController.deleteTask);
 
 module.exports = router;

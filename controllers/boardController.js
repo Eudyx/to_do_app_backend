@@ -47,7 +47,7 @@ const addingNewSection = async (req, res) => {
     if(!req?.body?.id || !req.body.sectionName) return res.status(400).json({ "message": "ID and section name are required" });
 
     const foundBoard = await Board.findOne({ _id: req.body.id }).exec();
-    console.log(foundBoard);
+
     if(!foundBoard) return res.status(204).json({ "message": `The ID ${req.body.id} was not found.` });
 
     const sectionName = req.body.sectionName;
@@ -69,7 +69,7 @@ const deleteSection = async (req, res) => {
 
     const foundSection = foundBoard.sections.filter(section => {if(section._id.toString() === id) return section});
     
-    if(!foundSection) return res.status(204).json({ "message": `ID ${id} not match.` });
+    if(!foundSection?.length) return res.sendStatus(204);
 
     const deletedSection = foundBoard.sections.filter(section => section._id !== foundSection[0]._id);
 
@@ -103,11 +103,33 @@ const addingNewTask = async (req, res) => {
     res.json(result);
 }
 
+const deleteTask = async (req, res) => {
+    const { id, bID } = req.body;
+
+    if(!id || !bID) return res.status(400).json({ "message": "Id and board id are required." });
+
+    const foundBoard = await Board.findOne({ _id: bID });
+
+    const foundTask = foundBoard.tasks.filter(task => {if(task._id.toString() === id) return task});
+    
+    if(!foundTask?.length) return res.sendStatus(204);
+
+    const deletedTask = foundBoard.tasks.filter(task => task._id !== foundTask[0]._id);
+
+    foundBoard.tasks = deletedTask;
+
+    const result = await foundBoard.save();
+
+    console.log(result);
+    res.json(result);
+}
+
 module.exports = {
     getBoardsByUser,
     createNewBoard,
     addingNewSection,
     deleteSection,
     addingNewTask,
+    deleteTask,
     deleteBoard
 };
