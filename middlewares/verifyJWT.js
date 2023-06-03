@@ -2,10 +2,10 @@ const jwt = require('jsonwebtoken');
 
 const verifyJWT = async (req, res, next) => {
     const authheader = req.headers.authorization || req.headers.Authorization;
-    if(!authheader?.startWith('Bearer ')) return res.sendStaus(401);
+    if(!authheader?.startsWith('Bearer ')) return res.sendStatus(401);
     const token = authheader.split(' ')[1];
 
-    console.log()
+    console.log(token);
     jwt.verify(
         token,
         process.env.ACCESS_TOKEN_SECRET,
@@ -16,3 +16,5 @@ const verifyJWT = async (req, res, next) => {
         }
     );
 }
+
+module.exports = verifyJWT;

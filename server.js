@@ -9,6 +9,8 @@ const errorHandler = require('./middlewares/errorHandler');
 const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 const connectDB = require('./config/dbConn');
+const credentials = require('./middlewares/credentials');
+const verifyJWT = require('./middlewares/verifyJwt');
 
 const PORT = process.env.PORT || 3500;
 
@@ -16,6 +18,8 @@ const PORT = process.env.PORT || 3500;
 connectDB();
 
 app.use(logger);
+
+app.use(credentials);
 
 app.use(cors(corsOptions));
 
@@ -29,10 +33,12 @@ app.use('/', require('./routes/root'));
 app.use('/register', require('./routes/register'));
 app.use('/login', require('./routes/auth'));
 
+
+app.use(verifyJWT);
 app.use('/board', require('./routes/board'));
 
 app.all('*', (req, res) => {
-    res.status(400);
+    res.status(404);
     if(req.accepts('html')) {
         res.sendFile(path.join(__dirname, 'views', '404.html'));
     }else if(req.accepts('json')) {
